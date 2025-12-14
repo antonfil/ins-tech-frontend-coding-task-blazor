@@ -1,0 +1,66 @@
+
+.vessel-pool {
+  --cell-size: 30px; /* keep consistent with anchorage; tweak later */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 35%;
+}
+
+.vessel-pool__title {
+  font-weight: 600;
+}
+
+.vessel-groups-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: auto;
+}
+
+.vessel-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.vessel-group__title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.vessel-group__list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.vessel {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #aaa;
+}
+
+.vessel__badge {
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  border: 1px solid #eee;
+}
+
+.vessel__badge--vertical {
+  top: 6px;
+  right: 3px;
+  padding: 6px 4px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

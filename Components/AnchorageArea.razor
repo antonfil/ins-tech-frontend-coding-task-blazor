@@ -1,1 +1,22 @@
-<div>Anchorage area</div>
+
+<div class="anchorage">
+    <div class="anchorage__title">
+        Anchorage area (@Width x @Height)
+    </div>
+    
+    <div class="anchorage__grid" style="@GridStyle">
+        @for (var i = 0; i < Width * Height; i++)
+        {
+          <div class="anchorage__cell"></div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Width { get; set; }
+    [Parameter] public int Height { get; set; }
+
+    private string GridStyle =>
+        $"grid-template-columns: repeat({Width}, var(--cell-size));" +
+        $"grid-template-rows: repeat({Height}, var(--cell-size));";
+}

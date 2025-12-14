@@ -1,0 +1,24 @@
+.anchorage {
+  --cell-size: 30px;
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+}
+
+.anchorage__title {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.anchorage__grid {
+  display: grid;
+  border: 1px solid #eee;
+  overflow: auto;
+}
+
+.anchorage__cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border: 1px solid #eee;
+  box-sizing: border-box;
+}

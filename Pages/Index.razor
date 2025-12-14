@@ -1,13 +1,50 @@
 ﻿@page "/"
 @using ins_tech_frontend_coding_task_blazor.Components
+@using ins_tech_frontend_coding_task_blazor.Models
+@inject ins_tech_frontend_coding_task_blazor.Services.FleetApiClient Api
 
 <PageTitle>Anchorage planner</PageTitle>
 
 <div class="board">
-  <div class="board_panel">
-    <AnchorageArea />
-  </div>
-  <div class="board_panel">
-    <VesselPool />
-  </div>
+  @if (_isLoading)
+      {
+          <div>Loading...</div>
+      }
+      else if (_error is not null)
+      {
+          <div class="error">Error: @_error</div>
+      }
+      else if (_data is not null)
+      {
+          <AnchorageArea
+            Width="_data.AnchorageSize.Width"
+            Height="_data.AnchorageSize.Height*10" />
+
+          <VesselPool Fleets="_data.Fleets" />
+      }
 </div>
+
+@code {
+    private FleetResponse? _data;
+    private bool _isLoading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _data = await Api.GetRandomFleetAsync();
+            if (_data is null)
+                _error = "Empty response from API.";
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}
+

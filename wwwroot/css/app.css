@@ -1,25 +1,14 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    height: 100%;
-    margin: 0;
 }
 
 .board {
-    height: 100vh;
-    padding: 10px;
+    max-height: 100vh;
+    padding: 12px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 10px;
-}
-
-.board_panel {
-    padding: 10px;
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    border: 2px dashed #ccc;
+    gap: 12px;
 }
 
 h1:focus {
