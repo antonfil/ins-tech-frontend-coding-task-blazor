@@ -11,6 +11,7 @@
 }
 
 .anchorage__grid {
+  position: relative;
   display: grid;
   border: 1px solid #eee;
   overflow: auto;
@@ -21,4 +22,11 @@
   height: var(--cell-size);
   border: 1px solid #eee;
   box-sizing: border-box;
+}
+
+.vessel {
+  position: absolute;
+  border-radius: 12px;
+  box-sizing: border-box;
+  background: #aaa;
 }

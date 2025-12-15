@@ -1,22 +1,55 @@
+@inject ins_tech_frontend_coding_task_blazor.Services.BoardState BoardState
+@implements IDisposable
 
 <div class="anchorage">
     <div class="anchorage__title">
-        Anchorage area (@Width x @Height)
+        Anchorage area (@BoardState.AnchorageDimensions.Width x @BoardState.AnchorageDimensions.Height)
     </div>
     
     <div class="anchorage__grid" style="@GridStyle">
-        @for (var i = 0; i < Width * Height; i++)
+        @for (var i = 0; i < BoardState.AnchorageDimensions.Height; i++)
         {
-          <div class="anchorage__cell"></div>
+            @for (var j = 0; j < BoardState.AnchorageDimensions.Width; j++)
+            {
+                var x = j;
+                var y = i;
+                <div
+                    class="anchorage__cell"
+                    ondragover="event.preventDefault();"
+                    @ondrop="() => BoardState.PlaceVessel(x, y)" />
+            }
+        }
+        @foreach (var placement in BoardState.VesselPlacements.Values)
+        {
+            <div class="vessel"
+                @key="placement.Vessel.Id"
+                style="
+                    width: calc(@(placement.Vessel.Width) * var(--cell-size));
+                    height: calc(@(placement.Vessel.Height) * var(--cell-size));
+                    left: calc(@(placement.X) * var(--cell-size));
+                    top: calc(@(placement.Y) * var(--cell-size));
+                "
+                title="@($"{placement.Vessel.ShipDesignation} ({placement.Vessel.Width}×{placement.Vessel.Height})")"
+            />
         }
     </div>
 </div>
 
 @code {
-    [Parameter] public int Width { get; set; }
-    [Parameter] public int Height { get; set; }
-
     private string GridStyle =>
-        $"grid-template-columns: repeat({Width}, var(--cell-size));" +
-        $"grid-template-rows: repeat({Height}, var(--cell-size));";
+        $"grid-template-columns: repeat({BoardState.AnchorageDimensions.Width}, var(--cell-size));" +
+        $"grid-template-rows: repeat({BoardState.AnchorageDimensions.Height}, var(--cell-size));";
+
+    
+    protected override void OnInitialized()
+    {
+        BoardState.Changed += OnBoardChanged;
+    }
+
+    private void OnBoardChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        BoardState.Changed -= OnBoardChanged;
+    }
 }

@@ -8,7 +8,7 @@ html, body {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 12px;
+    gap: 48px;
 }
 
 h1:focus {

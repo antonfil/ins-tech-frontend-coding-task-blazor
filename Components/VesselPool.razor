@@ -1,11 +1,13 @@
+@using ins_tech_frontend_coding_task_blazor.Services
 
-@using ins_tech_frontend_coding_task_blazor.Models
+@inject ins_tech_frontend_coding_task_blazor.Services.BoardState BoardState
+@implements IDisposable
 
 <div class="vessel-pool">
-    <div class="vessel-pool__title">Vessel pool (@_groups.Count)</div>
+    <div class="vessel-pool__title">Vessel pool (@BoardState.VesselGroups.Count)</div>
  
     <div class="vessel-groups-wrapper">
-        @foreach (var group in _groups)
+        @foreach (var group in BoardState.VesselGroups)
         {
         <div class="vessel-group">
             <div class="vessel-group__title">
@@ -18,9 +20,13 @@
                         @key="vessel.Id"
                         style="@GetVesselStyle(vessel)"
                         title="@($"{group.ShipDesignation} ({vessel.Width}×{vessel.Height})")"
-                    >
-                        <div class="vessel__badge@(vessel.Width == 1 ? " vessel__badge--vertical" : "")">
-                            @vessel.Width×@vessel.Height
+                    >   
+                        <div draggable="true"
+                            class="vessel__badge@(vessel.Width == 1 ? " vessel__badge--vertical" : "")"
+                            @ondragstart="() => BoardState.BeginDrag(vessel)"
+                            @ondragend="BoardState.EndDrag"
+                        >
+                           ⠿ @vessel.Width×@vessel.Height
                         </div>
                     </div>
                 }
@@ -31,38 +37,19 @@
 </div>
 
 @code {
-    [Parameter] public IReadOnlyList<FleetItem> Fleets { get; set; } = Array.Empty<FleetItem>();
-
-    private readonly List<VesselGroup> _groups = new List<VesselGroup>();
-
-    protected override void OnParametersSet()
-    {
-        _groups.Clear();
-
-        if (Fleets is null || Fleets.Count == 0)
-            return;
-
-        for (var fleetIndex = 0; fleetIndex < Fleets.Count; fleetIndex++)
-        {
-            var fleet = Fleets[fleetIndex];
-            var vessels = new List<Vessel>();
-            for (var vesselIndex = 0; vesselIndex < fleet.ShipCount; vesselIndex++)
-            {
-                vessels.Add(new Vessel(
-                    Id: $"{fleetIndex}_{vesselIndex}",
-                    Width: fleet.SingleShipDimensions.Width,
-                    Height: fleet.SingleShipDimensions.Height
-                ));
-            }
-            _groups.Add(new VesselGroup(fleet.ShipDesignation, vessels));
-        }
-    }
-
     private static string GetVesselStyle(Vessel vessel) =>
         $"width: calc({vessel.Width} * var(--cell-size));"+
         $"height: calc({vessel.Height} * var(--cell-size));";
 
-    private sealed record Vessel(string Id, int Width, int Height);
-    
-    private sealed record VesselGroup(string ShipDesignation, List<Vessel> Vessels);
+    protected override void OnInitialized()
+    {
+        BoardState.Changed += OnBoardChanged;
+    }
+
+    private void OnBoardChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        BoardState.Changed -= OnBoardChanged;
+    }
 }
