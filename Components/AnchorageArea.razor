@@ -1,3 +1,5 @@
+@using ins_tech_frontend_coding_task_blazor.Services
+
 @inject ins_tech_frontend_coding_task_blazor.Services.BoardState BoardState
 @implements IDisposable
 
@@ -6,39 +8,56 @@
         Anchorage area (@BoardState.AnchorageDimensions.Width x @BoardState.AnchorageDimensions.Height)
     </div>
     
-    <div class="anchorage__grid" style="@GridStyle">
-        @for (var i = 0; i < BoardState.AnchorageDimensions.Height; i++)
-        {
-            @for (var j = 0; j < BoardState.AnchorageDimensions.Width; j++)
+    <div class="anchorage__grid-wrapper">
+        <div 
+            class="anchorage__grid"
+            style="@GridStyle"
+            @ondragenter="OnDragEnter"
+            @ondragleave="OnDragLeave"
+            @ondragover:preventDefault="true"
+            @ondragover="OnCellDragOver"
+            @ondrop="() => BoardState.PlaceVessel(_dragX, _dragY)"
+        >
+            @if (_dragOver && BoardState.DraggingVessel is not null && BoardState.CanPlaceVessel(BoardState.DraggingVessel, _dragX, _dragY))
             {
-                var x = j;
-                var y = i;
                 <div
-                    class="anchorage__cell"
-                    ondragover="event.preventDefault();"
-                    @ondrop="() => BoardState.PlaceVessel(x, y)" />
+                    class="vessel-placement"
+                    style="
+                        left: @(BoardState.CellSizePx * _dragX)px;
+                        top: @(BoardState.CellSizePx * _dragY)px;
+                        width: @(BoardState.CellSizePx * BoardState.DraggingVessel.Width)px;
+                        height: @(BoardState.CellSizePx * BoardState.DraggingVessel.Height)px;
+                    "
+                />
             }
-        }
-        @foreach (var placement in BoardState.VesselPlacements.Values)
-        {
-            <div class="vessel"
-                @key="placement.Vessel.Id"
-                style="
-                    width: calc(@(placement.Vessel.Width) * var(--cell-size));
-                    height: calc(@(placement.Vessel.Height) * var(--cell-size));
-                    left: calc(@(placement.X) * var(--cell-size));
-                    top: calc(@(placement.Y) * var(--cell-size));
-                "
-                title="@($"{placement.Vessel.ShipDesignation} ({placement.Vessel.Width}×{placement.Vessel.Height})")"
-            />
-        }
+            @foreach (var placement in BoardState.VesselPlacements.Values)
+            {
+                var placementStyle =
+                    $"width: {placement.Vessel.Width * BoardState.CellSizePx}px;" +
+                    $"height: {placement.Vessel.Height * BoardState.CellSizePx}px;" +
+                    $"left: {placement.X * BoardState.CellSizePx}px;" +
+                    $"top: {placement.Y * BoardState.CellSizePx}px;";
+
+                if (BoardState.DraggingVessel is not null)
+                {
+                    placementStyle += "pointer-events: none;";
+                }
+                
+                <VesselCard
+                    @key="placement.Vessel.Id"
+                    VesselModel="placement.Vessel"
+                    CardTarget="VesselLocation.Anchorage"
+                    SX="@placementStyle"
+                />
+            }
+        </div>
     </div>
 </div>
 
 @code {
     private string GridStyle =>
-        $"grid-template-columns: repeat({BoardState.AnchorageDimensions.Width}, var(--cell-size));" +
-        $"grid-template-rows: repeat({BoardState.AnchorageDimensions.Height}, var(--cell-size));";
+        $"width: {BoardState.AnchorageDimensions.Width  * BoardState.CellSizePx}px;" +
+        $"height: {BoardState.AnchorageDimensions.Height * BoardState.CellSizePx}px;";
 
     
     protected override void OnInitialized()
@@ -51,5 +70,37 @@
     public void Dispose()
     {
         BoardState.Changed -= OnBoardChanged;
+    }
+
+    private bool _dragOver = false;
+    private int _dragX = 0;
+    private int _dragY = 0;
+    private bool _renderScheduled = false;
+
+    private void OnDragEnter()
+    {
+        _dragOver = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnDragLeave()
+    {
+        _dragOver = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnCellDragOver(MouseEventArgs e)
+    {    
+        if (BoardState.DraggingVessel is null) return;
+
+        var x = (int)((e.OffsetX - BoardState.DraggingVesselOffsetX) / BoardState.CellSizePx);
+        var y = (int)((e.OffsetY - BoardState.DraggingVesselOffsetY)  / BoardState.CellSizePx);
+        
+        if (x == _dragX && y == _dragY) return;
+
+        _dragX = x;
+        _dragY = y;
+
+        InvokeAsync(StateHasChanged);
     }
 }

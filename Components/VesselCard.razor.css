@@ -1,0 +1,52 @@
+.vessel {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-sizing: border-box;
+  background: #eee;
+}
+
+.vessel--locked {
+  cursor: not-allowed;
+  background: #fff;
+}
+
+.vessel--placed {
+  position: absolute
+}
+
+.vessel--locked::after {
+  content: "✓";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.vessel__badge {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 12px;
+  color: #fff;
+  border: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.vessel__badge--vertical {
+  padding: 6px 4px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

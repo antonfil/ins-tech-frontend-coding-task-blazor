@@ -1,0 +1,71 @@
+@using ins_tech_frontend_coding_task_blazor.Services
+@inject ins_tech_frontend_coding_task_blazor.Services.BoardState BoardState
+
+@if (CardTarget == VesselLocation.VesselPool && !Locked)
+{
+    <div
+        class="vessel"
+        style="@GetVesselStyle(VesselModel)"
+        title="@($"{VesselModel.ShipDesignation} ({VesselModel.Width}×{VesselModel.Height})")"
+        draggable="true"
+        @ondragstart="(DragEventArgs args) => BoardState.BeginDrag(VesselModel, args.OffsetX, args.OffsetY)"
+        @ondragend="BoardState.EndDrag"
+    >
+            <div
+                class="vessel__badge@(VesselModel.Width == 1 ? " vessel__badge--vertical" : "")"
+                style="@($"background: {VesselModel.Color};")"
+            >
+                @VesselModel.Index. @VesselModel.Width×@VesselModel.Height
+            </div>
+    </div>
+}
+else if (CardTarget == VesselLocation.VesselPool && Locked)
+{   
+    <div
+        class="vessel vessel--locked"
+        style="@GetVesselStyle(VesselModel)"
+        title="@($"{VesselModel.ShipDesignation} ({VesselModel.Width}×{VesselModel.Height})")"
+    >
+            <div
+                class="vessel__badge@(VesselModel.Width == 1 ? " vessel__badge--vertical" : "")"
+                style="@($"background: {VesselModel.Color};")"
+            >
+                @VesselModel.Index. @VesselModel.Width×@VesselModel.Height
+            </div>
+    </div>
+}
+else if (CardTarget == VesselLocation.Anchorage)
+{   
+    <div
+        class="vessel vessel--placed"
+        style="@GetVesselStyle(VesselModel)"
+        title="@($"{VesselModel.ShipDesignation} ({VesselModel.Width}×{VesselModel.Height})")"
+        draggable="true"
+    >
+            <div
+                class="vessel__badge@(VesselModel.Width == 1 ? " vessel__badge--vertical" : "")"
+                style="@($"background: {VesselModel.Color};")"
+            >
+                @VesselModel.Index. @VesselModel.Width×@VesselModel.Height
+            </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Vessel VesselModel { get; set; } = default!;
+
+    [Parameter]
+    public VesselLocation CardTarget { get; set; } = default!;
+
+    [Parameter]
+    public bool Locked { get; set; } = default!;
+
+    [Parameter]
+    public string SX { get; set; } = string.Empty;
+
+    private string GetVesselStyle(Vessel vesselModel) =>
+        $"width: {BoardState.CellSizePx * vesselModel.Width}px;" +
+        $"height: {BoardState.CellSizePx * vesselModel.Height}px;" +
+        SX;
+}

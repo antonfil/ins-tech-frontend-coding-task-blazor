@@ -10,23 +10,22 @@
   margin-bottom: 12px;
 }
 
-.anchorage__grid {
-  position: relative;
-  display: grid;
-  border: 1px solid #eee;
+.anchorage__grid-wrapper {
   overflow: auto;
 }
 
-.anchorage__cell {
-  width: var(--cell-size);
-  height: var(--cell-size);
-  border: 1px solid #eee;
-  box-sizing: border-box;
+.anchorage__grid {
+  position: relative;
+  background-size: var(--cell-size) var(--cell-size);
+  background-image:
+    linear-gradient(to right, #eee 1px, transparent 1px),
+    linear-gradient(to bottom, #eee 1px, transparent 1px);
 }
 
-.vessel {
+.vessel-placement {
   position: absolute;
-  border-radius: 12px;
   box-sizing: border-box;
-  background: #aaa;
+  background: transparent;
+  border: 2px solid #5bb450;
+  pointer-events: none;
 }

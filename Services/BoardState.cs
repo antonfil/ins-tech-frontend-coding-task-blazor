@@ -2,21 +2,25 @@ namespace ins_tech_frontend_coding_task_blazor.Services;
 
 public sealed class BoardState
 {
-  public static readonly string[] CommonColors = new[]
-  {
-    "#FF0000",
-    "#00FF00",
-    "#0000FF",
-    "#A52A2A",
-    "#800080"
-  };
-  public event Action? Changed;
+  public int CellSizePx { get; } = 30;
   public AnchorageDimensions AnchorageDimensions { get; private set; } = new(0, 0);
   public List<VesselGroup> VesselGroups { get; } = new();
   public Dictionary<Guid, VesselPlacement> VesselPlacements { get; } = new();
   public Vessel? DraggingVessel { get; private set; }
-  private bool[,] _occupied = new bool[0, 0];
+  public double DraggingVesselOffsetX { get; private set; } = 0;
+  public double DraggingVesselOffsetY { get; private set; } = 0;
   public bool Initilized { get; private set; } = false;
+  public event Action? Changed;
+
+  private bool[,] _occupied = new bool[0, 0];
+  private static readonly string[] CommonColors = new[]
+  {
+    "#1F77B4", // blue
+    "#2CA02C", // green
+    "#D62728", // red
+    "#9467BD", // purple
+    "#8C564B"  // brown
+  };
   
   public void Initialize(FleetResponse data)
   {
@@ -40,7 +44,8 @@ public sealed class BoardState
             ShipDesignation: fleet.ShipDesignation,
             Width: fleet.SingleShipDimensions.Width,
             Height: fleet.SingleShipDimensions.Height,
-            Color: color
+            Color: color,
+            Index: i + 1
         ));
       }
 
@@ -56,16 +61,20 @@ public sealed class BoardState
     NotifyChanged();
   }
 
-  public void BeginDrag(Vessel vessel)
+  public void BeginDrag(Vessel vessel, double offsetX, double offsetY)
   {
       DraggingVessel = vessel;
-      // NotifyChanged();
+      DraggingVesselOffsetX = offsetX;
+      DraggingVesselOffsetY = offsetY;
+      NotifyChanged();
   }
 
   public void EndDrag()
   {
       DraggingVessel = null;
-      // NotifyChanged();
+      DraggingVesselOffsetX = 0;
+      DraggingVesselOffsetY = 0;
+      NotifyChanged();
   }
 
   public bool PlaceVessel(int x, int y)
@@ -89,8 +98,30 @@ public sealed class BoardState
     return true;
   }
 
+  public void RemoveVessel(Guid vesselId)
+  {
+    if (!VesselPlacements.TryGetValue(vesselId, out var placement)) return;
+
+    var vessel = placement.Vessel;
+    var x = placement.X;
+    var y = placement.Y;
+
+    for (int i = x; i < x + vessel.Width; i++)
+    {
+      for (int j = y; j < y + vessel.Height; j++)
+      {
+        _occupied[i, j] = false;
+      }
+    }
+
+    VesselPlacements.Remove(vesselId);
+
+    NotifyChanged();
+  }
+
   public bool CanPlaceVessel(Vessel vessel, int x, int y)
   {
+    if (x < 0 || y < 0) return false;
     if (x + vessel.Width > AnchorageDimensions.Width) return false;
     if (y + vessel.Height > AnchorageDimensions.Height) return false;
 
@@ -114,7 +145,13 @@ public sealed record AnchorageDimensions(int Width, int Height);
 
 public sealed record VesselGroup(string ShipDesignation, List<Vessel> Vessels, string Color);
 
-public sealed record Vessel(Guid Id, string ShipDesignation, int Width, int Height, string Color);
+public sealed record Vessel(Guid Id, string ShipDesignation, int Width, int Height, string Color, int Index);
 
 public sealed record VesselPlacement(Vessel Vessel, int X, int Y);
+
+public enum VesselLocation
+{
+  Anchorage,
+  VesselPool
+}
 

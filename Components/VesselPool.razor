@@ -1,4 +1,5 @@
 @using ins_tech_frontend_coding_task_blazor.Services
+@using ins_tech_frontend_coding_task_blazor.Components
 
 @inject ins_tech_frontend_coding_task_blazor.Services.BoardState BoardState
 @implements IDisposable
@@ -10,25 +11,18 @@
         @foreach (var group in BoardState.VesselGroups)
         {
         <div class="vessel-group">
-            <div class="vessel-group__title">
+            <div class="vessel-group__title" style="color: @group.Color">
                 @group.ShipDesignation (@group.Vessels.Count)
             </div>
             <div class="vessel-group__list">
                 @foreach (var vessel in group.Vessels)
                 {
-                    <div class="vessel"
+                    <VesselCard
                         @key="vessel.Id"
-                        style="@GetVesselStyle(vessel)"
-                        title="@($"{group.ShipDesignation} ({vessel.Width}×{vessel.Height})")"
-                    >   
-                        <div draggable="true"
-                            class="vessel__badge@(vessel.Width == 1 ? " vessel__badge--vertical" : "")"
-                            @ondragstart="() => BoardState.BeginDrag(vessel)"
-                            @ondragend="BoardState.EndDrag"
-                        >
-                           ⠿ @vessel.Width×@vessel.Height
-                        </div>
-                    </div>
+                        VesselModel="vessel"
+                        CardTarget="VesselLocation.VesselPool"
+                        Locked="BoardState.IsVesselPlaced(vessel.Id)"
+                    />
                 }
             </div>
         </div>
@@ -37,10 +31,6 @@
 </div>
 
 @code {
-    private static string GetVesselStyle(Vessel vessel) =>
-        $"width: calc({vessel.Width} * var(--cell-size));"+
-        $"height: calc({vessel.Height} * var(--cell-size));";
-
     protected override void OnInitialized()
     {
         BoardState.Changed += OnBoardChanged;
