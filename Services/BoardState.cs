@@ -66,6 +66,15 @@ public sealed class BoardState
       DraggingVessel = vessel;
       DraggingVesselOffsetX = offsetX;
       DraggingVesselOffsetY = offsetY;
+      if (IsVesselPlaced(vessel.Id))
+      {
+          ClearOccupiedMap(
+              VesselPlacements[vessel.Id].X,
+              VesselPlacements[vessel.Id].Y,
+              vessel.Width,
+              vessel.Height
+          );
+      }
       NotifyChanged();
   }
 
@@ -82,16 +91,18 @@ public sealed class BoardState
     var vessel = DraggingVessel;
     if (vessel == null) return false;
 
-    if (!CanPlaceVessel(vessel, x, y)) return false;
+    if (!CanPlaceVessel(vessel, x, y)) 
+    {
+      if (IsVesselPlaced(vessel.Id))
+      {
+          RemoveVessel(vessel.Id);
+      }
+      return false;
+    }
 
     VesselPlacements[vessel.Id] = new VesselPlacement(vessel, x, y);
-    for (int i = x; i < x + vessel.Width; i++)
-    {
-      for (int j = y; j < y + vessel.Height; j++)
-      {
-        _occupied[i, j] = true;
-      }
-    }
+
+    FillOccupiedMap(x, y, vessel.Width, vessel.Height);
 
     NotifyChanged();
     
@@ -106,13 +117,7 @@ public sealed class BoardState
     var x = placement.X;
     var y = placement.Y;
 
-    for (int i = x; i < x + vessel.Width; i++)
-    {
-      for (int j = y; j < y + vessel.Height; j++)
-      {
-        _occupied[i, j] = false;
-      }
-    }
+    ClearOccupiedMap(x, y, vessel.Width, vessel.Height);
 
     VesselPlacements.Remove(vesselId);
 
@@ -158,6 +163,28 @@ public sealed class BoardState
   public bool IsVesselsPlacementCompleted()
   {
     return VesselPlacements.Count == VesselGroups.Sum(g => g.Vessels.Count);
+  }
+
+  private void ClearOccupiedMap(int x, int y, int width, int height)
+  {
+    for (int i = x; i < x + width; i++)
+    {
+      for (int j = y; j < y + height; j++)
+      {
+        _occupied[i, j] = false;
+      }
+    }
+  }
+
+  private void FillOccupiedMap(int x, int y, int width, int height)
+  {
+    for (int i = x; i < x + width; i++)
+    {
+      for (int j = y; j < y + height; j++)
+      {
+        _occupied[i, j] = true;
+      }
+    }
   }
 
   private void NotifyChanged() => Changed?.Invoke();

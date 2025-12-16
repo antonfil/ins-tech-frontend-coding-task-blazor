@@ -4,6 +4,7 @@
   border-radius: 12px;
   box-sizing: border-box;
   background: #eee;
+  cursor: grabbing;
 }
 
 .vessel--locked {
@@ -12,6 +13,7 @@
 }
 
 .vessel--placed {
+  cursor: not-allowed;
   position: absolute
 }
 
