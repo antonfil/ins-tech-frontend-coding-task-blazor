@@ -6,7 +6,7 @@
       "name": "Blazor WASM: Launch (Chrome)",
       "type": "blazorwasm",
       "request": "launch",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/src/ins-tech-frontend-coding-task-blazor",
       "browser": "edge",
       "url": "http://localhost:5238",
       "timeout": 60000
