@@ -10,7 +10,7 @@
   font-weight: 600;
 }
 
-.vessel-groups-wrapper {
+.vessel-pool__groups-list {
   display: flex;
   flex-direction: column;
   gap: 18px;

@@ -9,7 +9,8 @@
         title="@($"{VesselModel.ShipDesignation} ({VesselModel.Width}×{VesselModel.Height})")"
         draggable="true"
         @ondragstart="(DragEventArgs args) => BoardState.BeginDrag(VesselModel, args.OffsetX, args.OffsetY)"
-        @ondragend="BoardState.EndDrag"
+        @ondragend="() => BoardState.EndDrag()"
+        @ondblclick="() => BoardState.RotateVessel(VesselModel.Id)"
     >
             <div
                 class="vessel__badge@(VesselModel.Width == 1 ? " vessel__badge--vertical" : "")"
@@ -40,7 +41,6 @@ else if (CardTarget == VesselLocation.Anchorage)
         class="vessel vessel--placed"
         style="@GetVesselStyle(VesselModel)"
         title="@($"{VesselModel.ShipDesignation} ({VesselModel.Width}×{VesselModel.Height})")"
-        draggable="true"
     >
             <div
                 class="vessel__badge@(VesselModel.Width == 1 ? " vessel__badge--vertical" : "")"
@@ -67,5 +67,7 @@ else if (CardTarget == VesselLocation.Anchorage)
     private string GetVesselStyle(Vessel vesselModel) =>
         $"width: {BoardState.CellSizePx * vesselModel.Width}px;" +
         $"height: {BoardState.CellSizePx * vesselModel.Height}px;" +
+        $"min-width: {BoardState.CellSizePx * vesselModel.Width}px;" +
+        $"min-height: {BoardState.CellSizePx * vesselModel.Height}px;" +
         SX;
 }

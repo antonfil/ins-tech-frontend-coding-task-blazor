@@ -1,5 +1,5 @@
 .anchorage {
-  --cell-size: 30px;
+  --cell-size: 40px;
   display: flex;
   flex-direction: column;
   max-width: 60%;

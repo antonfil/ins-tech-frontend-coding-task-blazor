@@ -2,7 +2,7 @@ namespace ins_tech_frontend_coding_task_blazor.Services;
 
 public sealed class BoardState
 {
-  public int CellSizePx { get; } = 30;
+  public int CellSizePx { get; } = 40;
   public AnchorageDimensions AnchorageDimensions { get; private set; } = new(0, 0);
   public List<VesselGroup> VesselGroups { get; } = new();
   public Dictionary<Guid, VesselPlacement> VesselPlacements { get; } = new();
@@ -137,6 +137,28 @@ public sealed class BoardState
   }
 
   public bool IsVesselPlaced(Guid vesselId) => VesselPlacements.ContainsKey(vesselId);
+
+  public void RotateVessel(Guid vesselId)
+  {
+    foreach (var group in VesselGroups)
+    {
+      for (int i = 0; i < group.Vessels.Count; i++)
+      {
+        var v = group.Vessels[i];
+        if (v.Id == vesselId)
+        {
+          group.Vessels[i] = v with { Width = v.Height, Height = v.Width };
+          NotifyChanged();
+          return;
+        }
+      }
+    }
+  }
+
+  public bool IsVesselsPlacementCompleted()
+  {
+    return VesselPlacements.Count == VesselGroups.Sum(g => g.Vessels.Count);
+  }
 
   private void NotifyChanged() => Changed?.Invoke();
 }

@@ -6,6 +6,10 @@
 <div class="anchorage">
     <div class="anchorage__title">
         Anchorage area (@BoardState.AnchorageDimensions.Width x @BoardState.AnchorageDimensions.Height)
+        @if (_dragOver && BoardState.DraggingVessel is not null)
+        {
+            <span>Dragging top left corner: (@_dragX:@_dragY)</span>
+        }
     </div>
     
     <div class="anchorage__grid-wrapper">
@@ -16,7 +20,10 @@
             @ondragleave="OnDragLeave"
             @ondragover:preventDefault="true"
             @ondragover="OnCellDragOver"
-            @ondrop="() => BoardState.PlaceVessel(_dragX, _dragY)"
+            @ondrop="() => {
+                BoardState.PlaceVessel(_dragX, _dragY);
+                BoardState.EndDrag();
+            }"
         >
             @if (_dragOver && BoardState.DraggingVessel is not null && BoardState.CanPlaceVessel(BoardState.DraggingVessel, _dragX, _dragY))
             {
