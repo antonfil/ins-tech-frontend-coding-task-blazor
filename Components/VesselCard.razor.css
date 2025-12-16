@@ -4,6 +4,10 @@
   border-radius: 12px;
   box-sizing: border-box;
   background: #eee;
+  cursor: grab;
+}
+
+.vessel:active {
   cursor: grabbing;
 }
 
@@ -13,7 +17,6 @@
 }
 
 .vessel--placed {
-  cursor: not-allowed;
   position: absolute
 }
 

@@ -41,6 +41,15 @@ else if (CardTarget == VesselLocation.Anchorage)
         class="vessel vessel--placed"
         style="@GetVesselStyle(VesselModel)"
         title="@($"{VesselModel.ShipDesignation} ({VesselModel.Width}×{VesselModel.Height})")"
+        draggable="true"
+        @ondragenter:stopPropagation="true"
+        @ondragenter="() => {}"
+        @ondragleave:stopPropagation="true"
+        @ondragleave="() => {}"
+        @ondragover:stopPropagation="true"
+        @ondragover="() => {}"
+        @ondragstart="(DragEventArgs args) => BoardState.BeginDrag(VesselModel, args.OffsetX, args.OffsetY)"
+        @ondragend="() => BoardState.EndDrag()"
     >
             <div
                 class="vessel__badge@(VesselModel.Width == 1 ? " vessel__badge--vertical" : "")"

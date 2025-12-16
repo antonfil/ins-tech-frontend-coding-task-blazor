@@ -7,6 +7,7 @@ public sealed class BoardState
   public List<VesselGroup> VesselGroups { get; } = new();
   public Dictionary<Guid, VesselPlacement> VesselPlacements { get; } = new();
   public Vessel? DraggingVessel { get; private set; }
+  public bool IsDraggingSuccessfull { get; private set; } = false;
   public double DraggingVesselOffsetX { get; private set; } = 0;
   public double DraggingVesselOffsetY { get; private set; } = 0;
   public bool Initilized { get; private set; } = false;
@@ -30,6 +31,9 @@ public sealed class BoardState
     VesselGroups.Clear();
     VesselPlacements.Clear();
     DraggingVessel = null;
+    IsDraggingSuccessfull = false;
+    DraggingVesselOffsetX = 0;
+    DraggingVesselOffsetY = 0;
 
     for (int fleetIndex = 0; fleetIndex < data.Fleets.Count; fleetIndex++)
     {
@@ -64,6 +68,7 @@ public sealed class BoardState
   public void BeginDrag(Vessel vessel, double offsetX, double offsetY)
   {
       DraggingVessel = vessel;
+      IsDraggingSuccessfull = false;
       DraggingVesselOffsetX = offsetX;
       DraggingVesselOffsetY = offsetY;
       if (IsVesselPlaced(vessel.Id))
@@ -80,6 +85,11 @@ public sealed class BoardState
 
   public void EndDrag()
   {
+      if (DraggingVessel == null) return;
+      if (!IsDraggingSuccessfull)
+      {
+          RemoveVessel(DraggingVessel.Id);
+      }
       DraggingVessel = null;
       DraggingVesselOffsetX = 0;
       DraggingVesselOffsetY = 0;
@@ -88,21 +98,15 @@ public sealed class BoardState
 
   public bool PlaceVessel(int x, int y)
   {
-    var vessel = DraggingVessel;
-    if (vessel == null) return false;
+    if (DraggingVessel == null) return false;
 
-    if (!CanPlaceVessel(vessel, x, y)) 
-    {
-      if (IsVesselPlaced(vessel.Id))
-      {
-          RemoveVessel(vessel.Id);
-      }
-      return false;
-    }
+    if (!CanPlaceVessel(DraggingVessel, x, y)) return false;
 
-    VesselPlacements[vessel.Id] = new VesselPlacement(vessel, x, y);
+    VesselPlacements[DraggingVessel.Id] = new VesselPlacement(DraggingVessel, x, y);
 
-    FillOccupiedMap(x, y, vessel.Width, vessel.Height);
+    FillOccupiedMap(x, y, DraggingVessel.Width, DraggingVessel.Height);
+
+    IsDraggingSuccessfull = true;
 
     NotifyChanged();
     
