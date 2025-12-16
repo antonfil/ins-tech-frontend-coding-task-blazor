@@ -1,4 +1,5 @@
 ﻿@page "/"
+@implements IDisposable
 @using ins_tech_frontend_coding_task_blazor.Components
 @using ins_tech_frontend_coding_task_blazor.Services
 @inject ins_tech_frontend_coding_task_blazor.Services.FleetApiClient Api
@@ -7,34 +8,91 @@
 <PageTitle>Anchorage planner</PageTitle>
 
 <div class="board">
-  @if (_isLoading)
-      {
-          <div>Loading...</div>
-      }
-      else if (_error is not null)
-      {
-          <div class="error">Error: @_error</div>
-      }
-      else if (BoardState.Initilized)
-      {
-          <AnchorageArea />
-          <VesselPool />
-      }
+    @if (_isLoading)
+    {
+        <div>Loading...</div>
+    }
+    else if (_error is not null)
+    {
+        <div class="error">Error: @_error</div>
+    }
+    else if (BoardState.Initilized)
+    {
+        <button 
+            class="btn btn-outline-primary"
+            style="position: absolute; top: 4px; right: 12px"
+            @onclick="LoadBoardAsync"
+            disabled="@(_isLoading)"
+        >
+            Reload board
+        </button>
+        <AnchorageArea />
+        <VesselPool />
+    }
 </div>
+
+@if (_showCompleteModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.001);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Placement completed</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="() => _showCompleteModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <p>All vessels have been placed. Would you like to reload the board with a new random fleet?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="() => _showCompleteModal = false">Close</button>
+                    <button class="btn btn-primary" @onclick="ReloadBoardAsync">Reload board</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop show"></div>
+}
 
 @code {
     private bool _isLoading = true;
     private string? _error;
+    private bool _showCompleteModal = false;
 
     protected override async Task OnInitializedAsync()
     {
+        BoardState.Changed += OnBoardStateChanged;
+        await LoadBoardAsync();
+    }
+
+    private void OnBoardStateChanged()
+    {
+        if (BoardState.IsVesselsPlacementCompleted())
+        {
+            _showCompleteModal = true;
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ReloadBoardAsync()
+    {
+        _showCompleteModal = false;
+        await LoadBoardAsync();
+    }
+
+    private async Task LoadBoardAsync()
+    {
+        _isLoading = true;
+        _error = null;
+        StateHasChanged();
+
         try
         {
             var _data = await Api.GetRandomFleetAsync();
             if (_data is null)
             {
                 _error = "Empty response from API.";
-            }            
+            }
             else
             {
                 BoardState.Initialize(_data);
@@ -47,7 +105,13 @@
         finally
         {
             _isLoading = false;
+            StateHasChanged();
         }
+    }
+
+    public void Dispose()
+    {
+        BoardState.Changed -= OnBoardStateChanged;
     }
 }
 
