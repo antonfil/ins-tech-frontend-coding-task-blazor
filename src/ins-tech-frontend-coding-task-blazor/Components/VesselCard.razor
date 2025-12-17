@@ -48,6 +48,8 @@ else if (CardTarget == VesselLocation.Anchorage)
         @ondragleave="() => {}"
         @ondragover:stopPropagation="true"
         @ondragover="() => {}"
+        @ondrop:stopPropagation="true"
+        @ondrop="() => {}"
         @ondragstart="(DragEventArgs args) => BoardState.BeginDrag(VesselModel, args.OffsetX, args.OffsetY)"
         @ondragend="() => BoardState.EndDrag()"
     >
