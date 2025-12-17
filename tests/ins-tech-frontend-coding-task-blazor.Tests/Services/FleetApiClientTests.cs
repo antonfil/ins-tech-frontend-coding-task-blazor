@@ -1,9 +1,10 @@
 using FluentAssertions;
 using Moq;
 using Moq.Protected;
-using ins_tech_frontend_coding_task_blazor.Services;
 using System.Net;
 using System.Text.Json;
+using ins_tech_frontend_coding_task_blazor.Models;
+using ins_tech_frontend_coding_task_blazor.Services;
 
 namespace ins_tech_frontend_coding_task_blazor.Tests.UnitTests.Services
 {

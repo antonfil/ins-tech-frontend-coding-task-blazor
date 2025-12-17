@@ -30,3 +30,5 @@ $> dotnet test
 - `src/ins-tech-frontend-coding-task-blazor/Components/VesselCard.razor` - implements individual vessel card component
 - `src/ins-tech-frontend-coding-task-blazor/Services/BoardState.cs` - implements game core logic and state between components
 - `src/ins-tech-frontend-coding-task-blazor/Services/FleetApiClient.cs` - implements api service. I use public proxy to avoid CORS issues - so the url I call is https://proxy.corsfix.com/?https://esa.instech.no/api/fleets/random instead of direct one https://esa.instech.no/api/fleets/random
+- `src/ins-tech-frontend-coding-task-blazor/Models/BoardModels.cs` - contains board model objects
+- `src/ins-tech-frontend-coding-task-blazor/Models/ApiModels.cs` - contains api model objects
