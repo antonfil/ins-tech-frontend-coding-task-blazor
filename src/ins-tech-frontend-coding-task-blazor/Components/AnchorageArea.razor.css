@@ -27,6 +27,6 @@
   position: absolute;
   box-sizing: border-box;
   background: transparent;
-  border: 2px solid #5bb450;
+  border: 3px solid #5bb450;
   pointer-events: none;
 }

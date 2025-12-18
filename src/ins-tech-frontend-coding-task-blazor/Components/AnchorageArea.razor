@@ -19,11 +19,12 @@
             style="@GridStyle"
             @ondragenter="OnDragEnter"
             @ondragleave="OnDragLeave"
-            @ondragover:preventDefault="true"
+            @ondragover:preventDefault="_dragOver && BoardState.DraggingVessel is not null && BoardState.CanPlaceVessel(BoardState.DraggingVessel, _dragX, _dragY)"
             @ondragover="OnCellDragOver"
             @ondrop="() => {
                 BoardState.PlaceVessel(_dragX, _dragY);
                 BoardState.EndDrag();
+                OnDragLeave();
             }"
         >
             @if (_dragOver && BoardState.DraggingVessel is not null && BoardState.CanPlaceVessel(BoardState.DraggingVessel, _dragX, _dragY))
@@ -95,8 +96,8 @@
     {    
         if (BoardState.DraggingVessel is null) return;
 
-        var x = (int)((e.OffsetX - BoardState.DraggingVesselOffsetX) / BoardState.CellSizePx);
-        var y = (int)((e.OffsetY - BoardState.DraggingVesselOffsetY)  / BoardState.CellSizePx);
+        var x = (int)Math.Round((e.OffsetX - BoardState.DraggingVesselOffsetX) / BoardState.CellSizePx);
+        var y = (int)Math.Round((e.OffsetY - BoardState.DraggingVesselOffsetY)  / BoardState.CellSizePx);
         
         if (x == _dragX && y == _dragY) return;
 
