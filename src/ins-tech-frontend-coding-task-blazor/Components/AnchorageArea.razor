@@ -77,33 +77,26 @@
     }
 
     private bool _dragOver = false;
-    private int _dragX = 0;
-    private int _dragY = 0;
+    private int _dragX = -1;
+    private int _dragY = -1;
 
     private void OnDragEnter()
     {
         _dragOver = true;
-        InvokeAsync(StateHasChanged);
     }
 
     private void OnDragLeave()
     {
         _dragOver = false;
-        InvokeAsync(StateHasChanged);
+        _dragX = -1;
+        _dragY = -1;
     }
 
     private void OnCellDragOver(MouseEventArgs e)
     {    
         if (BoardState.DraggingVessel is null) return;
 
-        var x = (int)Math.Round((e.OffsetX - BoardState.DraggingVesselOffsetX) / BoardState.CellSizePx);
-        var y = (int)Math.Round((e.OffsetY - BoardState.DraggingVesselOffsetY)  / BoardState.CellSizePx);
-        
-        if (x == _dragX && y == _dragY) return;
-
-        _dragX = x;
-        _dragY = y;
-
-        InvokeAsync(StateHasChanged);
+        _dragX = (int)Math.Round((e.OffsetX - BoardState.DraggingVesselOffsetX) / BoardState.CellSizePx);
+        _dragY = (int)Math.Round((e.OffsetY - BoardState.DraggingVesselOffsetY)  / BoardState.CellSizePx);
     }
 }
